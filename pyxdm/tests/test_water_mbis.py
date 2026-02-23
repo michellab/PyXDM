@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from pyxdm import XDMCalculator, XDMSession
+from .. import XDMCalculator, XDMSession
 
 DATA_DIR = Path(__file__).parent / "data"
 MOLDEN_FILE = DATA_DIR / "water.orca.molden.input"

@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from pyxdm import XDMSession
+from .. import XDMSession
 
 
 @pytest.fixture(scope="module")

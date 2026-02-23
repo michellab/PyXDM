@@ -1,6 +1,6 @@
 """Tests for XDMSession setup."""
 
-from pyxdm import XDMCalculator, XDMSession
+from .. import XDMCalculator, XDMSession
 
 
 class TestXDMSessionSetup:
