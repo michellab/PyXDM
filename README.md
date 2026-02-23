@@ -4,7 +4,7 @@
 
 ![PyXDM Logo](dev/pyxdm_logo.png)
 
-PyXDM is a Python package for calculating XDM (Exchange-hole Dipole Moment) multipole moments using multiple atoms-in-molecules (AIM) partitioning schemes.
+PyXDM is a Python package for calculating XDM (Exchange-hole Dipole Moment) moments using atoms-in-molecules (AIM) partitioning schemes.
 
 ## Features
 
