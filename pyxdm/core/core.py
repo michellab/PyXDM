@@ -1,6 +1,7 @@
-import numpy as np
-from typing import Any, List, Union
 import logging
+from typing import Any, List, Union
+
+import numpy as np
 
 try:
     from .exchange_hole_cpp import compute_b_sigma

@@ -1,16 +1,17 @@
 """Command line interface for XDM calculations."""
 
 import argparse
+import logging
 import sys
+import time
 from pathlib import Path
+
+import numpy as np
 
 from .core import XDMSession
 from .partitioning import PartitioningSchemeFactory
-from .utils.formatting import log_mol_info, log_table, log_boxed_title, log_charges_populations, get_atomic_symbol
+from .utils.formatting import get_atomic_symbol, log_boxed_title, log_charges_populations, log_mol_info, log_table
 from .utils.io import write_h5_output
-import logging
-import numpy as np
-import time
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,7 @@
 """Formatting utilities for XDM output."""
 
 import logging
+
 import horton as ht
 
 logger = logging.getLogger(__name__)

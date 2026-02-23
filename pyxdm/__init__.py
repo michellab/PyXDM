@@ -8,5 +8,4 @@ from .core import XDMCalculator, XDMSession
 from .grids import CustomGrid, load_mesh
 from .logger import logger
 
-
 __all__ = ["XDMSession", "XDMCalculator", "CustomGrid", "load_mesh", "logger"]

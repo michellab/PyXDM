@@ -1,7 +1,8 @@
 """Grid utilities for XDM calculations."""
 
-import numpy as np
 from typing import Tuple
+
+import numpy as np
 
 
 def load_mesh(mesh_filename: str) -> Tuple[np.ndarray, np.ndarray]:

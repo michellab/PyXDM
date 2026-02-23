@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Union, Any
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Any, Optional, Union
 
 from ..grids import CustomGrid
 

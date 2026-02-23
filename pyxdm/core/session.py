@@ -1,13 +1,13 @@
 """XDM calculation session management."""
 
-import sys
 import logging
+import sys
 from pathlib import Path
-from typing import Optional, Any
+from typing import Any, Optional
 
-from ..grids import load_mesh, CustomGrid
-from ..partitioning import PartitioningSchemeFactory
 from ..core import XDMCalculator
+from ..grids import CustomGrid, load_mesh
+from ..partitioning import PartitioningSchemeFactory
 
 logger = logging.getLogger(__name__)
 

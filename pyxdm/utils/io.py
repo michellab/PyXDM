@@ -1,12 +1,13 @@
 """Input/output utilities for PyXDM."""
 
 import logging
-import numpy as np
-import h5py
-from typing import Dict, Any
+from typing import Any, Dict
 
-from .formatting import get_atomic_symbol
+import h5py
+import numpy as np
+
 from .. import __version__
+from .formatting import get_atomic_symbol
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +106,7 @@ def write_h5_output(filename: str, session, xdm_results: Dict[str, Any], write_h
             first_scheme_results = next(iter(xdm_results.values()))
             if "populations" in first_scheme_results:
                 nelec = int(round(np.sum(first_scheme_results["populations"])))
-        
+
         if nelec is None:
             nelec = np.nan
 
