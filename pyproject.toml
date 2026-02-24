@@ -56,8 +56,8 @@ full = [
 pyxdm = "pyxdm.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/jmorado/pyxdm"
-Repository = "https://github.com/jmorado/pyxdm"
+Homepage = "https://github.com/michellab/pyxdm"
+Repository = "https://github.com/michellab/pyxdm"
 
 [tool.setuptools.packages.find]
 where = ["."]
