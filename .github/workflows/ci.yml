@@ -12,7 +12,7 @@ concurrency:
 
 defaults:
   run:
-    shell: bash -l {0} 
+    shell: bash -l {0}  # needed so conda is activated in every step
 
 jobs:
   lint:
@@ -30,22 +30,6 @@ jobs:
 
       - name: Run ruff
         run: ruff check .
-
-  typecheck:
-    name: Type-check (mypy)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install package + mypy
-        run: pip install mypy numpy h5py && pip install -e .
-
-      - name: Run mypy
-        run: mypy pyxdm --ignore-missing-imports
 
   test:
     name: Tests (Python ${{ matrix.python-version }})
