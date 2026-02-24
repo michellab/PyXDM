@@ -76,6 +76,26 @@ known-first-party = ["pyxdm"]
 combine-as-imports = true
 force-single-line = false
 
+[tool.pytest.ini_options]
+testpaths = ["pyxdm/tests"]
+addopts = [
+    "--cov=pyxdm",
+    "--cov-report=term-missing",
+    "--cov-report=xml",
+    "-v",
+]
+
+[tool.coverage.run]
+source = ["pyxdm"]
+omit = ["pyxdm/tests/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]
+
 [tool.mypy]
 python_version = "3.10"
 warn_return_any = true
