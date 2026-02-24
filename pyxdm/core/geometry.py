@@ -1,12 +1,15 @@
 """Geometry-related utilities for XDM calculations."""
+
 import numpy as np
 from numpy.typing import NDArray
 
 
-def compute_distance_matrix(coords: NDArray[np.float64],) -> NDArray[np.float64]:
+def compute_distances(
+    coords: NDArray[np.float64],
+) -> NDArray[np.float64]:
     """
     Compute pairwise distance matrix for a set of coordinates.
-    
+
     Parameters
     ----------
     coords : np.ndarray

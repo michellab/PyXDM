@@ -1,5 +1,7 @@
+"""Core XDM calculator for computing multipole moments and related properties."""
+
 import logging
-from typing import Any, List, Union
+from typing import Any, List, Optional, Union
 
 import numpy as np
 
@@ -192,3 +194,61 @@ class XDMCalculator:
         geom_mean = np.prod(eigenvalues) ** (1 / 3)
         f_geom = (geom_mean**2) / (mean_val**2)
         return f_geom
+
+    @staticmethod
+    def calculate_c6(m1_i, m1_j, alpha_i, alpha_j):
+        """Calculate the C6 interaction between two atoms."""
+        return (m1_i * m1_j * alpha_i * alpha_j) / (m1_i * alpha_j + m1_j * alpha_i)
+
+    @staticmethod
+    def calculate_c8(m1_i, m1_j, m2_i, m2_j, alpha_i, alpha_j):
+        """Calculate the C8 interaction between two atoms."""
+        return (3.0 / 2.0) * (alpha_i * alpha_j * (m1_i * m2_j + m2_i * m1_j)) / (m1_i * alpha_j + m1_j * alpha_i)
+
+    @staticmethod
+    def calculate_c10(m1_i, m1_j, m2_i, m2_j, m3_i, m3_j, alpha_i, alpha_j):
+        """Calculate the C10 interaction between two atoms."""
+        oct_dip = 2 * alpha_i * alpha_j * (m1_i * m3_j + m3_i * m1_j) / (m1_i * alpha_j + m1_j * alpha_i)
+        quad_quad = (21.0 / 5.0) * (alpha_i * alpha_j * m2_i * m2_j) / (m1_i * alpha_j + m1_j * alpha_i)
+        return oct_dip + quad_quad
+
+    def calculate_dispersion_coefficients(
+        self, partition_obj: Any, atomic_pols: np.ndarray, m1: np.ndarray, m2: np.ndarray, m3: np.ndarray
+    ) -> dict:
+        """Calculate dispersion coefficients for all atoms."""
+        c6 = np.zeros((atomic_pols.shape[0], atomic_pols.shape[0]))
+        c8 = np.zeros((atomic_pols.shape[0], atomic_pols.shape[0]))
+        c10 = np.zeros((atomic_pols.shape[0], atomic_pols.shape[0]))
+        for i in range(atomic_pols.shape[0]):
+            for j in range(i, atomic_pols.shape[0]):
+                c6[i, j] = self.calculate_c6(m1[i], m1[j], atomic_pols[i], atomic_pols[j])
+                c8[i, j] = self.calculate_c8(m1[i], m1[j], m2[i], m2[j], atomic_pols[i], atomic_pols[j])
+                c10[i, j] = self.calculate_c10(m1[i], m1[j], m2[i], m2[j], m3[i], m3[j], atomic_pols[i], atomic_pols[j])
+        return {partition_obj.name: {"c6": c6, "c8": c8, "c10": c10}}
+
+    def calculate_dispersion_energy(
+        self,
+        partition_obj: Any,
+        coordinates: np.ndarray,
+        dispersion_coefficients: dict,
+        r_crit: Optional[np.ndarray] = None,
+        order: Union[List[int], int] = [1, 2, 3],
+    ) -> dict:
+        """Calculate dispersion energy for all atoms."""
+        from . import compute_distances
+
+        order = order if isinstance(order, list) else [order]
+        c6 = dispersion_coefficients[partition_obj.name]["c6"] if 1 in order else 0
+        c8 = dispersion_coefficients[partition_obj.name]["c8"] if 2 in order else 0
+        c10 = dispersion_coefficients[partition_obj.name]["c10"] if 3 in order else 0
+
+        # Compute distances and
+        r = compute_distances(coordinates)
+        rcrit = r_crit if r_crit is not None else np.zeros_like(r)
+
+        # Compute dispersion energy using only the upper triangle without the diagonal
+        E6 = np.triu(c6 / (r**6 + rcrit**6), k=1).sum()
+        E8 = np.triu(c8 / (r**8 + rcrit**8), k=1).sum()
+        E10 = np.triu(c10 / (r**10 + rcrit**10), k=1).sum()
+        E_disp = -np.sum(E6 + E8 + E10)
+        return {partition_obj.name: {"E_disp": E_disp}}

@@ -10,7 +10,9 @@ import numpy as np
 
 from .core import XDMSession
 from .partitioning import PartitioningSchemeFactory
-from .utils.formatting import get_atomic_symbol, log_boxed_title, log_charges_populations, log_mol_info, log_table
+from .utils.formatting import (get_atomic_symbol, log_boxed_title,
+                               log_charges_populations, log_mol_info,
+                               log_table)
 from .utils.io import write_h5_output
 
 logger = logging.getLogger(__name__)
