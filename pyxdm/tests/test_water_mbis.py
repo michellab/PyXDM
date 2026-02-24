@@ -32,7 +32,6 @@ class TestDistances:
         from ..core import compute_distances
 
         distances = compute_distances(mbis_session.mol.coordinates)
-        print(distances)
         np.testing.assert_allclose(distances, water_ref_mbis["distances"], rtol=1e-2, err_msg="Distances deviate from postg reference")
 
 
