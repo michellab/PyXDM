@@ -51,6 +51,15 @@ jobs:
           environment-file: environment.yaml
           auto-activate-base: false
 
+      - name: Fix libint2 soname (horton compiled against libint2.so.2 / libint2.2.dylib)
+        run: |
+          if [ -f "$CONDA_PREFIX/lib/libint2.so" ] && [ ! -f "$CONDA_PREFIX/lib/libint2.so.2" ]; then
+            ln -sf "$CONDA_PREFIX/lib/libint2.so" "$CONDA_PREFIX/lib/libint2.so.2"
+          fi
+          if [ -f "$CONDA_PREFIX/lib/libint2.dylib" ] && [ ! -f "$CONDA_PREFIX/lib/libint2.2.dylib" ]; then
+            ln -sf "$CONDA_PREFIX/lib/libint2.dylib" "$CONDA_PREFIX/lib/libint2.2.dylib"
+          fi
+
       - name: Install package + test dependencies
         run: pip install -e ".[test]"
 

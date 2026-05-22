@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 
 try:
     import horton as ht
-except ImportError:
-    logger.error("horton package is required for XDM calculations")
+except ImportError as e:
+    logger.error("horton package is required for XDM calculations.")
     sys.exit(1)
 
 

@@ -93,6 +93,26 @@ xdm_results = session.calculator.calculate_xdm_moments(
 )
 ```
 
+## Troubleshooting
+
+### `ImportError` when importing HORTON (`libint2` not found)
+
+On some systems, HORTON is compiled against a versioned `libint2` (e.g. `libint2.so.2` on Linux, `libint2.2.dylib` on macOS), but conda-forge only installs the unversioned library. If you see an error like:
+
+```
+ImportError: libint2.so.2: cannot open shared object file: No such file or directory
+```
+
+Create the missing symlink manually:
+
+```bash
+# Linux
+ln -sf "$CONDA_PREFIX/lib/libint2.so" "$CONDA_PREFIX/lib/libint2.so.2"
+
+# macOS
+ln -sf "$CONDA_PREFIX/lib/libint2.dylib" "$CONDA_PREFIX/lib/libint2.2.dylib"
+```
+
 ## Acknowledgments
 
 Some implementations in this package, such as the Newton-Raphson algorithm for the Becke-Roussel (BR) exchange model, are based on [postg](https://github.com/aoterodelaroza/postg). As a state-of-the-art package for XDM calculations, postg serves as an essential reference for accuracy and methodology. The aim of this package is mainly to provide easy-to-use access to a broader range of partitioning schemes beyond Hirshfeld.
