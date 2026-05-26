@@ -138,15 +138,24 @@ class BeckePartitioning(PartitioningScheme):
 
     NAME: str = "becke"
 
-    def __init__(self) -> None:
+    def __init__(self, lmax: int = 3, k: int = 3) -> None:
         """
         Initialize Becke partitioning.
+
+        Parameters
+        ----------
+        lmax : int, default=3
+            Maximum angular momentum for multipole expansion
+        k : int, default=3
+            Order of the polynomials used in the Becke switching function
 
         Returns
         -------
         None
         """
         super().__init__()
+        self.lmax = lmax
+        self.k = k
 
     def compute_weights(self, mol: Any, grid: Union[CustomGrid, Any]) -> None:
         """
@@ -178,6 +187,8 @@ class BeckePartitioning(PartitioningScheme):
             grid,
             rho_total,
             local=False,
+            lmax=self.lmax,
+            k=self.k,
         )
         becke.do_all()
 
@@ -195,7 +206,7 @@ class HirshfeldPartitioning(PartitioningScheme):
 
     NAME: str = "hirshfeld"
 
-    def __init__(self, proatom_db: Optional[str] = None) -> None:
+    def __init__(self, proatom_db: Optional[str] = None, lmax: int = 3) -> None:
         """
         Initialize Hirshfeld partitioning.
 
@@ -203,6 +214,8 @@ class HirshfeldPartitioning(PartitioningScheme):
         ----------
         proatom_db : Optional[str], default=None
             Path to pro-atom database. If None, uses default database.
+        lmax : int, default=3
+            Maximum angular momentum for multipole expansion
 
         Returns
         -------
@@ -210,6 +223,7 @@ class HirshfeldPartitioning(PartitioningScheme):
         """
         super().__init__()
         self.proatom_db = proatom_db
+        self.lmax = lmax
 
     def compute_weights(self, mol: Any, grid: Union[CustomGrid, Any]) -> None:
         """
@@ -249,6 +263,7 @@ class HirshfeldPartitioning(PartitioningScheme):
             rho_total,
             proatomdb,
             local=False,
+            lmax=self.lmax,
         )
         hirshfeld.do_all()
 
@@ -272,6 +287,7 @@ class HirshfeldIPartitioning(PartitioningScheme):
         proatom_db: Optional[str] = None,
         maxiter: int = 500,
         threshold: float = 1e-6,
+        lmax: int = 3,
     ) -> None:
         """
         Initialize Hirshfeld-I partitioning.
@@ -284,6 +300,8 @@ class HirshfeldIPartitioning(PartitioningScheme):
             Maximum number of iterations for convergence
         threshold : float, default=1e-6
             Convergence threshold for iterative process
+        lmax : int, default=3
+            Maximum angular momentum for multipole expansion
 
         Returns
         -------
@@ -293,6 +311,7 @@ class HirshfeldIPartitioning(PartitioningScheme):
         self.proatom_db = proatom_db
         self.maxiter = maxiter
         self.threshold = threshold
+        self.lmax = lmax
 
     def compute_weights(self, mol: Any, grid: Union[CustomGrid, Any]) -> None:
         """
@@ -328,6 +347,7 @@ class HirshfeldIPartitioning(PartitioningScheme):
             rho_total,
             proatomdb,
             local=False,
+            lmax=self.lmax,
             maxiter=self.maxiter,
             threshold=self.threshold,
         )
@@ -364,6 +384,7 @@ class IterativeStockholderPartitioning(PartitioningScheme):
         self,
         maxiter: int = 500,
         threshold: float = 1e-6,
+        lmax: int = 3,
     ) -> None:
         """
         Initialize Iterative Stockholder partitioning.
@@ -374,10 +395,13 @@ class IterativeStockholderPartitioning(PartitioningScheme):
             Maximum number of iterations for self-consistent procedure
         threshold : float, default=1e-6
             Convergence threshold for density changes between iterations
+        lmax : int, default=3
+            Maximum angular momentum for multipole expansion
         """
         super().__init__()
         self.maxiter = maxiter
         self.threshold = threshold
+        self.lmax = lmax
 
     def compute_weights(self, mol: Any, grid: Union[CustomGrid, Any]) -> None:
         """
@@ -404,6 +428,7 @@ class IterativeStockholderPartitioning(PartitioningScheme):
             mol.pseudo_numbers,
             grid,
             rho_total,
+            lmax=self.lmax,
             maxiter=self.maxiter,
             threshold=self.threshold,
         )
@@ -425,7 +450,7 @@ class MBISPartitioning(PartitioningScheme):
 
     NAME: str = "mbis"
 
-    def __init__(self, maxiter: int = 500, threshold: float = 1e-6) -> None:
+    def __init__(self, maxiter: int = 500, threshold: float = 1e-6, lmax: int = 3) -> None:
         """Initialize MBIS partitioning.
 
         Parameters
@@ -434,10 +459,13 @@ class MBISPartitioning(PartitioningScheme):
             Maximum number of iterations for convergence
         threshold : float, default=1e-6
             Convergence threshold for iterative process
+        lmax : int, default=3
+            Maximum angular momentum for multipole expansion
         """
         super().__init__()
         self.maxiter = maxiter
         self.threshold = threshold
+        self.lmax = lmax
 
     def compute_weights(self, mol: Any, grid: Union[CustomGrid, Any]) -> None:
         """Create MBIS partition object for grid projection.
@@ -463,6 +491,7 @@ class MBISPartitioning(PartitioningScheme):
             mol.pseudo_numbers,
             grid,
             rho_total,
+            lmax=self.lmax,
             maxiter=self.maxiter,
             threshold=self.threshold,
         )
@@ -504,11 +533,11 @@ class PartitioningSchemeFactory:
         **kwargs
             Additional keyword arguments passed to the scheme constructor.
             Different schemes accept different parameters:
-            - mbis: maxiter, threshold, agspec
-            - becke: (no parameters)
-            - hirshfeld: proatom_db
-            - hirshfeld-i: proatom_db, maxiter, threshold
-            - iterstock/iterative-stockholder/is: maxiter, threshold
+            - mbis: lmax, maxiter, threshold
+            - becke: lmax, k
+            - hirshfeld: proatom_db, lmax
+            - hirshfeld-i: proatom_db, lmax, maxiter, threshold
+            - iterative-stockholder: lmax, maxiter, threshold
 
         Returns
         -------
@@ -526,20 +555,20 @@ class PartitioningSchemeFactory:
 
         # Filter kwargs based on scheme requirements
         if scheme_name in [BeckePartitioning.NAME]:
-            # Becke doesn't accept any special parameters
-            filtered_kwargs = {}
+            # Becke accepts lmax, k
+            filtered_kwargs = {k: v for k, v in kwargs.items() if k in ["lmax", "k"]}
         elif scheme_name in [HirshfeldPartitioning.NAME]:
-            # Hirshfeld only accepts 'proatom_db'
-            filtered_kwargs = {k: v for k, v in kwargs.items() if k in ["proatom_db"]}
+            # Hirshfeld accepts proatom_db, lmax
+            filtered_kwargs = {k: v for k, v in kwargs.items() if k in ["proatom_db", "lmax"]}
         elif scheme_name in [HirshfeldIPartitioning.NAME]:
-            # Hirshfeld-I accepts proatom_db, maxiter, threshold
-            filtered_kwargs = {k: v for k, v in kwargs.items() if k in ["proatom_db", "maxiter", "threshold"]}
+            # Hirshfeld-I accepts proatom_db, lmax, maxiter, threshold
+            filtered_kwargs = {k: v for k, v in kwargs.items() if k in ["proatom_db", "lmax", "maxiter", "threshold"]}
         elif scheme_name in [IterativeStockholderPartitioning.NAME, "iterstock", "is"]:
-            # Iterative Stockholder accepts maxiter, threshold
-            filtered_kwargs = {k: v for k, v in kwargs.items() if k in ["maxiter", "threshold"]}
+            # Iterative Stockholder accepts lmax, maxiter, threshold
+            filtered_kwargs = {k: v for k, v in kwargs.items() if k in ["lmax", "maxiter", "threshold"]}
         else:
-            # MBIS accepts maxiter, threshold, agspec
-            filtered_kwargs = {k: v for k, v in kwargs.items() if k in ["maxiter", "threshold"]}
+            # MBIS accepts lmax, maxiter, threshold
+            filtered_kwargs = {k: v for k, v in kwargs.items() if k in ["lmax", "maxiter", "threshold"]}
 
         scheme_class = cls._schemes[scheme_name]
         result = scheme_class(**filtered_kwargs)

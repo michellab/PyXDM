@@ -127,16 +127,32 @@ class XDMSession:
         self.calculator = XDMCalculator(self.mol)
         logger.debug("XDM calculator initialized")
 
-    def setup_partition_schemes(self, schemes: list[str], proatomdb: Optional[str] = None) -> dict:
+    def setup_partition_schemes(self, schemes, proatomdb: Optional[str] = None) -> dict:
         """
         Setup partitioning schemes for the session.
 
         Parameters
         ----------
-        schemes : list of str
-            List of partitioning scheme names to use
+        schemes : list of str or dict
+            List of partitioning scheme names to use, or a dictionary mapping
+            scheme names to their configuration options.
+            
+            If dict, keys are scheme names and values are dicts of kwargs:
+            - mbis: lmax (int, default=3), maxiter (int, default=500), threshold (float, default=1e-6)
+            - becke: lmax (int, default=3), k (int, default=3)
+            - hirshfeld: lmax (int, default=3)
+            - hirshfeld-i: lmax (int, default=3), maxiter (int, default=500), threshold (float, default=1e-6)
+            - iterative-stockholder: lmax (int, default=3), maxiter (int, default=500), threshold (float, default=1e-6)
+            
+            Example:
+                schemes = {
+                    "mbis": {"lmax": 4, "maxiter": 500, "threshold": 1e-6},
+                    "hirshfeld-i": {"lmax": 3, "maxiter": 1000, "threshold": 1e-5},
+                    "becke": {"lmax": 3, "k": 3}
+                }
+                
         proatomdb : str, optional
-            Path to proatom database for Hirshfeld schemes
+            Path to proatom database for Hirshfeld-based schemes (hirshfeld, hirshfeld-i)
 
         Returns
         -------
@@ -146,9 +162,14 @@ class XDMSession:
         self.partitions = {}
         self.partition_schemes = {}
 
-        for scheme in schemes:
+        if isinstance(schemes, dict):
+            scheme_configs = schemes
+        else:
+            scheme_configs = {scheme: {} for scheme in schemes}
+
+        for scheme, config in scheme_configs.items():
             try:
-                scheme_kwargs = {}
+                scheme_kwargs = config.copy() if config else {}
                 if proatomdb:
                     scheme_kwargs["proatom_db"] = proatomdb
 
