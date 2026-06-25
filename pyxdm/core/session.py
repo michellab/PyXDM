@@ -15,6 +15,7 @@ try:
     import horton as ht
 except ImportError as e:
     logger.error("horton package is required for XDM calculations.")
+    logger.error(e)
     sys.exit(1)
 
 
